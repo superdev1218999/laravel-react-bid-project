@@ -11,16 +11,14 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
+        User::truncate();
         // Create primary user account for testing.
         User::create([
             'name' => 'User Test',
             'email' => 'user@test.dev',
-            'password' => bcrypt('password')
+            'password' => bcrypt('password'),
         ]);
 
-        // Create another five user accounts.
-        factory(User::class, 5)->create();
-
-        $this->command->info('Users table seeded.');
+        $this->command->info('users table seeded.');
     }
 }
