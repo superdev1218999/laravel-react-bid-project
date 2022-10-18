@@ -1,4 +1,8 @@
 <?php
+
+use Database\Seeders\BidComponentSeeder;
+use Database\Seeders\BidLineItemSeeder;
+use Database\Seeders\BidSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -10,10 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // Create Users.
         $this->call(UserSeeder::class);
-
-        // Create Todo data.
-        $this->call(TodoSeeder::class);
+        $this->call(BidSeeder::class);
+        $this->call(BidComponentSeeder::class);
+        $this->call(BidLineItemSeeder::class);
     }
 }
