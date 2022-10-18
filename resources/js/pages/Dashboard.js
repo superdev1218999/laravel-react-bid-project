@@ -1,157 +1,160 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import Http from '../Http';
+import _ from "lodash";
+import React, { useState } from "react";
+import { Table } from "reactstrap";
 
-class Dashboard extends Component {
-  constructor(props) {
-    super(props);
+import Http from "../Http";
+import Input from "../components/Input";
 
-    // Initial state.
-    this.state = {
-      todo: null,
-      error: false,
-      data: [],
-    };
+const Dashboard = () => {
+  const [clear, setClear] = useState(false);
+  const [index, setIndex] = useState(1);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(false);
 
-    // API endpoint.
-    this.api = '/api/v1/todo';
-  }
-
-  componentDidMount() {
-    Http.get(`${this.api}?status=open`)
-      .then((response) => {
-        const { data } = response.data;
-        this.setState({
-          data,
-          error: false,
-        });
-      })
-      .catch(() => {
-        this.setState({
-          error: 'Unable to fetch data.',
-        });
-      });
-  }
-
-  handleChange = (e) => {
-    const { name, value } = e.target;
-    this.setState({ [name]: value });
+  const addElement = () => {
+    if (!data[index - 1]?.value) {
+      setError(true);
+    } else {
+      setIndex((prevIndex) => prevIndex + 1);
+    }
   };
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    const { todo } = this.state;
-    this.addTodo(todo);
+  const clearElement = () => {
+    setData([]);
+    setIndex(1);
+    setClear((prev) => !prev);
   };
 
-  addTodo = (todo) => {
-    Http.post(this.api, { value: todo })
-      .then(({ data }) => {
-        const newItem = {
-          id: data.id,
-          value: todo,
-        };
-        const allTodos = [newItem, ...this.state.data];
-        this.setState({ data: allTodos, todo: null });
-        this.todoForm.reset();
-      })
-      .catch(() => {
-        this.setState({
-          error: 'Sorry, there was an error saving your to do.',
-        });
-      });
+  const handleSubmit = () => {
+    if (!data[index - 1]?.value) {
+      setError(true);
+    } else {
+      console.log(data);
+    }
   };
 
-  closeTodo = (e) => {
-    const { key } = e.target.dataset;
-    const { data: todos } = this.state;
-
-    Http.patch(`${this.api}/${key}`, { status: 'closed' })
-      .then(() => {
-        const updatedTodos = todos.filter(
-          (todo) => todo.id !== parseInt(key, 10),
-        );
-        this.setState({ data: updatedTodos });
-      })
-      .catch(() => {
-        this.setState({
-          error: 'Sorry, there was an error closing your to do.',
-        });
-      });
-  };
-
-  render() {
-    const { data, error } = this.state;
-
-    return (
-      <div className="container py-5">
-        <div className="add-todos mb-5">
-          <h1 className="text-center mb-4">Add a To Do</h1>
-          <form
-            method="post"
-            onSubmit={this.handleSubmit}
-            ref={(el) => {
-              this.todoForm = el;
-            }}
-          >
-            <div className="form-group">
-              <label htmlFor="addTodo">Add a New To Do</label>
-              <div className="d-flex">
-                <input
-                  id="addTodo"
-                  name="todo"
-                  className="form-control mr-3"
-                  placeholder="Build a To Do app..."
-                  onChange={this.handleChange}
+  return (
+    <div className="container py-5">
+      <div className="mb-5">
+        <h1 className="text-center mb-4">Add a Initial "Bid"</h1>
+        <div className="d-flex align-items-center justify-content-between">
+          <h5>Create Initial "Bid" to component or line item you want.</h5>
+          <div>
+            <button className="btn btn-primary mx-1" onClick={addElement}>
+              Add
+            </button>
+            <button className="btn btn-danger mx-1" onClick={clearElement}>
+              Clear
+            </button>
+          </div>
+        </div>
+        <div className="form-group">
+          {Array.from(
+            {
+              length: index,
+            },
+            (_, i) => {
+              return (
+                <Input
+                  index={i}
+                  data={data}
+                  clear={clear}
+                  setData={setData}
+                  setError={setError}
+                  lastIndex={index === i + 1}
                 />
-                <button type="submit" className="btn btn-primary">
-                  Add
-                </button>
-              </div>
-            </div>
-          </form>
+              );
+            }
+          )}
         </div>
 
         {error && (
           <div className="alert alert-warning" role="alert">
-            {error}
+            Choose the component or input the value
           </div>
         )}
 
-        <div className="todos">
-          <h1 className="text-center mb-4">Open To Dos</h1>
-          <table className="table table-striped">
-            <tbody>
-              <tr>
-                <th>To Do</th>
-                <th>Action</th>
-              </tr>
-              {data.map((todo) => (
-                <tr key={todo.id}>
-                  <td>{todo.value}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={this.closeTodo}
-                      data-key={todo.id}
-                    >
-                      Close
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="d-flex justify-content-center py-3">
+          <button className="btn btn-success" onClick={handleSubmit}>
+            Submit
+          </button>
         </div>
       </div>
-    );
-  }
-}
 
-const mapStateToProps = (state) => ({
-  isAuthenticated: state.Auth.isAuthenticated,
-  user: state.Auth.user,
-});
+      <div className="result">
+        <h1 className="text-center mb-4">Result</h1>
+        <Table bordered>
+          <tbody>
+            <tr>
+              <th>Provided numbers</th>
+              <th>Weight</th>
+              <th>Propagated numbers</th>
+              <th>Status</th>
+              <th>Actual cost confident factor</th>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr className="first">
+              <td>Provided numbers</td>
+              <td className="text-end">Weight</td>
+              <td>Propagated numbers</td>
+              <td>Status</td>
+              <td>Actual cost confident factor</td>
+            </tr>
+            <tr className="second">
+              <td>Provided numbers</td>
+              <td>Weight</td>
+              <td>Propagated numbers</td>
+              <td>Status</td>
+              <td>Actual cost confident factor</td>
+            </tr>
+            <tr className="third">
+              <td>Provided numbers</td>
+              <td>Weight</td>
+              <td>Propagated numbers</td>
+              <td>Status</td>
+              <td>Actual cost confident factor</td>
+            </tr>
+            <tr className="third">
+              <td>Provided numbers</td>
+              <td>Weight</td>
+              <td>Propagated numbers</td>
+              <td>Status</td>
+              <td>Actual cost confident factor</td>
+            </tr>
+            <tr className="second">
+              <td>Provided numbers</td>
+              <td>Weight</td>
+              <td>Propagated numbers</td>
+              <td>Status</td>
+              <td>Actual cost confident factor</td>
+            </tr>
+            <tr className="third">
+              <td>Provided numbers</td>
+              <td>Weight</td>
+              <td>Propagated numbers</td>
+              <td>Status</td>
+              <td>Actual cost confident factor</td>
+            </tr>
+            <tr className="fourth">
+              <td>Provided numbers</td>
+              <td>Weight</td>
+              <td>Propagated numbers</td>
+              <td>Status</td>
+              <td>Actual cost confident factor</td>
+            </tr>
+            <tr className="fifth">
+              <td>Provided numbers</td>
+              <td>Weight</td>
+              <td>Propagated numbers</td>
+              <td>Status</td>
+              <td>Actual cost confident factor</td>
+            </tr>
+          </tbody>
+        </Table>
+      </div>
+    </div>
+  );
+};
 
-export default connect(mapStateToProps)(Dashboard);
+export default Dashboard;
