@@ -1,28 +1,28 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { Link, Redirect } from 'react-router-dom';
-import ReeValidate from 'ree-validate';
-import classNames from 'classnames';
-import AuthService from '../services';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { Link, Redirect } from "react-router-dom";
+import ReeValidate from "ree-validate";
+import classNames from "classnames";
+import AuthService from "../services";
 
 class Home extends Component {
   constructor() {
     super();
 
     this.validator = new ReeValidate({
-      email: 'required|email',
-      password: 'required|min:6',
+      email: "required|email",
+      password: "required|min:6",
     });
 
     this.state = {
       loading: false,
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       errors: {},
       response: {
         error: false,
-        message: '',
+        message: "",
       },
     };
   }
@@ -48,7 +48,7 @@ class Home extends Component {
     const { name, value } = e.target;
 
     // Avoid validation until input has a value.
-    if (value === '') {
+    if (value === "") {
       return;
     }
 
@@ -82,7 +82,7 @@ class Home extends Component {
     this.props.dispatch(AuthService.login(credentials)).catch((err) => {
       this.loginForm.reset();
       const errors = Object.values(err.errors);
-      errors.join(' ');
+      errors.join(" ");
       const response = {
         error: true,
         message: errors,
@@ -94,7 +94,7 @@ class Home extends Component {
 
   render() {
     // If user is already authenticated we redirect to entry location.
-    const { from } = this.props.location.state || { from: { pathname: '/' } };
+    const { from } = this.props.location.state || { from: { pathname: "/" } };
     const { isAuthenticated } = this.props;
     if (isAuthenticated) {
       return <Redirect to={from} />;
@@ -109,25 +109,15 @@ class Home extends Component {
             <div className="row">
               <div className="section-about col-lg-6 mb-4 mb-lg-0">
                 <div>
-                  <h2>Example To Do App</h2>
+                  <h2>Actuals Propagation</h2>
                   <p>
-                    Built with Laravel and React. Includes JWT auth,
-                    registration, login, routing and tests.
-                    {' '}
-                    <a href="https://wptheming.com/2019/02/building-a-react-app-on-laravel/">
-                      Learn more
-                    </a>
-                    .
-                  </p>
-                  <p>
-                    <a href="https://github.com/devinsays/laravel-react-bootstrap">
-                      Source code and documentation on GitHub.
-                    </a>
+                    Develop an "Actuals import" solution that projects actual
+                    costs based on what is provided by the client.
                   </p>
                 </div>
               </div>
               <div className="section-login col-lg-6">
-                <h4>Log in to the App</h4>
+                <h4>Login</h4>
 
                 <div className="card-login card mb-3">
                   <div className="card-body">
@@ -151,8 +141,8 @@ class Home extends Component {
                           id="email"
                           type="email"
                           name="email"
-                          className={classNames('form-control', {
-                            'is-invalid': 'email' in errors,
+                          className={classNames("form-control", {
+                            "is-invalid": "email" in errors,
                           })}
                           placeholder="Enter email"
                           required
@@ -161,7 +151,7 @@ class Home extends Component {
                           disabled={loading}
                         />
 
-                        {'email' in errors && (
+                        {"email" in errors && (
                           <div className="invalid-feedback">{errors.email}</div>
                         )}
                       </div>
@@ -171,8 +161,8 @@ class Home extends Component {
                         <input
                           id="password"
                           type="password"
-                          className={classNames('form-control', {
-                            'is-invalid': 'password' in errors,
+                          className={classNames("form-control", {
+                            "is-invalid": "password" in errors,
                           })}
                           name="password"
                           placeholder="Enter password"
@@ -181,7 +171,7 @@ class Home extends Component {
                           onBlur={this.handleBlur}
                           disabled={loading}
                         />
-                        {'password' in errors && (
+                        {"password" in errors && (
                           <div className="invalid-feedback">
                             {errors.password}
                           </div>
@@ -191,8 +181,8 @@ class Home extends Component {
                       <div className="form-group text-center">
                         <button
                           type="submit"
-                          className={classNames('btn btn-primary', {
-                            'btn-loading': loading,
+                          className={classNames("btn btn-primary", {
+                            "btn-loading": loading,
                           })}
                         >
                           Sign In
@@ -200,10 +190,8 @@ class Home extends Component {
                       </div>
 
                       <div className="login-invite-text text-center">
-                        {"Don't have an account?"}
-                        {' '}
-                        <Link to="/register">Register</Link>
-                        .
+                        {"Don't have an account?"}{" "}
+                        <Link to="/register">Register</Link>.
                       </div>
                     </form>
                   </div>

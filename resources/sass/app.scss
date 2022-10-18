@@ -2,11 +2,11 @@
 @import "variables";
 
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@import "~bootstrap/scss/bootstrap";
 
 // General
 .grid {
-    display: grid;
+  display: grid;
 }
 
 a {
@@ -34,108 +34,128 @@ label {
 $btn-size-base: 1rem;
 
 .btn {
-    transition: all 0.2s ease;
+  transition: all 0.2s ease;
 
-    &-loading {
-        pointer-events: none;
-        cursor: default;
-        color: transparent;
-        position: relative;
+  &-loading {
+    pointer-events: none;
+    cursor: default;
+    color: transparent;
+    position: relative;
 
-        &::after,
-        &::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: $btn-size-base * 1.5;
-            height: $btn-size-base * 1.5;
-            margin-top: -(($btn-size-base * 1.5)/2);
-            margin-left: -(($btn-size-base * 1.5)/2);
-            border-radius: 100%;
-            border: ($btn-size-base * 0.3) solid transparent;
-        }
-
-        &::before {
-            border-color: rgba(0, 0, 0, 0.15);
-        }
-
-        &::after {
-            border-color: white transparent transparent;
-            animation: btn-spin 0.6s linear;
-            animation-iteration-count: infinite;
-        }
+    &::after,
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: $btn-size-base * 1.5;
+      height: $btn-size-base * 1.5;
+      margin-top: -(($btn-size-base * 1.5)/2);
+      margin-left: -(($btn-size-base * 1.5)/2);
+      border-radius: 100%;
+      border: ($btn-size-base * 0.3) solid transparent;
     }
+
+    &::before {
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    &::after {
+      border-color: white transparent transparent;
+      animation: btn-spin 0.6s linear;
+      animation-iteration-count: infinite;
+    }
+  }
 }
 
 @keyframes btn-spin {
-    from {
-        transform: rotate(0);
-    }
+  from {
+    transform: rotate(0);
+  }
 
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // Header
 header {
-    border-bottom: 1px solid #EBEDF8;
-    z-index: 10;
-    padding: 20px $grid-gutter-width/2;
+  border-bottom: 1px solid #ebedf8;
+  z-index: 10;
+  padding: 20px $grid-gutter-width/2;
+  @include media-breakpoint-up(md) {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    padding: 0;
+  }
+
+  .logo {
     @include media-breakpoint-up(md) {
-        display: grid;
-        grid-template-columns: 1fr 4fr;
-        padding: 0;
+      padding: 15px $grid-gutter-width/2;
     }
+  }
 
-    .logo {
-        @include media-breakpoint-up(md) {
-            padding: 15px $grid-gutter-width/2;
-        }
+  .navigation {
+    @include media-breakpoint-up(md) {
+      padding: 15px $grid-gutter-width/2;
     }
-
-    .navigation {
-        @include media-breakpoint-up(md) {
-            padding: 15px $grid-gutter-width/2;
-        }
-    }
+  }
 }
 
 // Login Page
 .section-about {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 // Login Form
 .section-login {
-    h4 {
-        margin-bottom: 1.5rem;
-        @include media-breakpoint-up(lg) {
-            text-align: center;
-        }
+  h4 {
+    margin-bottom: 1.5rem;
+    @include media-breakpoint-up(lg) {
+      text-align: center;
     }
+  }
 
-    .card-body {
-        padding: 3rem;
-    }
+  .card-body {
+    padding: 3rem;
+  }
 
-    .form-remember {
-        font-size: 0.9rem;
-    }
+  .form-remember {
+    font-size: 0.9rem;
+  }
 
-    .btn-primary {
-        width: 100%;
-        border-radius: 20px;
-    }
+  .btn-primary {
+    width: 100%;
+    border-radius: 20px;
+  }
 
-    .login-invite-text {
-        font-size: 0.9rem;
-    }
+  .login-invite-text {
+    font-size: 0.9rem;
+  }
 
-    .password-reset-link {
-        font-size: 0.9rem;
-    }
+  .password-reset-link {
+    font-size: 0.9rem;
+  }
+}
+
+//Table Row Color
+.result {
+  .first {
+    background-color: #38761d;
+    color: #fff;
+  }
+  .second {
+    background-color: #93c47d;
+  }
+  .third {
+    background-color: #d9ead3;
+  }
+  .fourth {
+    background-color: #c9daf8;
+  }
+  .fifth {
+    background-color: #6d9eeb;
+  }
 }
