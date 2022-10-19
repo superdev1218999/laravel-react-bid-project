@@ -142,20 +142,32 @@ header {
 
 //Table Row Color
 .result {
-  .first {
+  .purple {
+    color: #9900ff;
+  }
+  .fifth {
     background-color: #38761d;
     color: #fff;
   }
-  .second {
+  .fourth {
     background-color: #93c47d;
   }
   .third {
     background-color: #d9ead3;
+    td:nth-child(2) {
+      padding-left: 10%;
+    }
   }
-  .fourth {
+  .second {
     background-color: #c9daf8;
+    td:nth-child(2) {
+      padding-left: 20%;
+    }
   }
-  .fifth {
+  .first {
     background-color: #6d9eeb;
+    td:nth-child(2) {
+      padding-left: 30%;
+    }
   }
 }

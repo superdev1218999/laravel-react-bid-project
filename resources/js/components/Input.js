@@ -1,6 +1,15 @@
+import PropTypes from "prop-types";
 import React, { useState, useEffect } from "react";
 
-const Input = ({ index, lastIndex, data, setData, setError, clear }) => {
+const Input = ({
+  data,
+  index,
+  clear,
+  setData,
+  options,
+  setError,
+  lastIndex,
+}) => {
   const [inputValue, setInputValue] = useState("");
   const [selectValue, setSelectValue] = useState("");
 
@@ -12,10 +21,14 @@ const Input = ({ index, lastIndex, data, setData, setError, clear }) => {
   const handleSelect = (e) => {
     const { value } = e.target;
 
-    data.push({ id: value, value: "" });
-    setData(data);
     setError(false);
     setSelectValue(value);
+    if (data.length === index) {
+      data.push({ component_ref_id: value, value: "" });
+    } else {
+      data[index].component_ref_id = value;
+    }
+    setData(data);
   };
 
   const handleInput = (e) => {
@@ -44,12 +57,9 @@ const Input = ({ index, lastIndex, data, setData, setError, clear }) => {
           disabled={!lastIndex}
         >
           <option>Choose</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
+          {options.map((option, key) => {
+            return <option value={option.value}>{option.label}</option>;
+          })}
         </select>
       </div>
       <div className="d-flex align-items-center col-md-6">
@@ -68,6 +78,22 @@ const Input = ({ index, lastIndex, data, setData, setError, clear }) => {
       </div>
     </div>
   );
+};
+
+Input.propTypes = {
+  clear: PropTypes.bool.isRequired,
+  data: PropTypes.shape({
+    component_ref_id: PropTypes.string,
+    value: PropTypes.number,
+  }),
+  index: PropTypes.number.isRequired,
+  lastIndex: PropTypes.number.isRequired,
+  options: PropTypes.arrayOf({
+    value: PropTypes.string,
+    label: PropTypes.string,
+  }),
+  setData: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
 };
 
 export default Input;
