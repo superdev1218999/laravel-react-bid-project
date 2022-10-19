@@ -1,11 +1,3 @@
-#### Create your environment file:
-
-```bash
-cp .env.example .env
-```
-
-_The app key is used to salt passwords. If you need to work with production data you'll want to use the same app key as defined in the .env file in production so password hashes match._
-
 #### Update these settings in the .env file:
 
 - DB_DATABASE (your local database, i.e. "bid")
@@ -39,6 +31,12 @@ php artisan jwt:secret
 php artisan migrate
 ```
 
+#### Dump autoload
+
+```bash
+composer dump-autoload
+```
+
 #### Install Javascript dependencies:
 
 ```bash
@@ -60,7 +58,7 @@ npm run dev
 If you need sample data to work with, you can seed the database:
 
 ```
-php artisan migrate:refresh --seed --force
+php artisan db:seed
 ```
 
 #### Seeded User

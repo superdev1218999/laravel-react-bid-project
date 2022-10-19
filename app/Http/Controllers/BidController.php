@@ -28,20 +28,20 @@ class BidController extends ApiController
     {
         $request_data = json_decode($request->get('data'));
         $given_nodes = calc_given_nodes($request_data);
-        $neigh_nodes = calc_neigh_nodes($given_nodes);
+        $result = $given_nodes;
+        for ($i = 0; $i < count($given_nodes); $i ++) {
+            $result = calc_neigh_nodes($result, $given_nodes[$i]);
+        }
         $total_count = get_total_count();
         $all_nodes = get_all_nodes();
-        $deep = 2;
-        $result = $neigh_nodes;
         do {
             for ($i = 0; $i < $total_count; $i++) {
                 if (is_already_calc($result, $all_nodes[$i]) == null) {
                     continue;
                 }
-                $result = calc_parent_node($result, $all_nodes[$i], $deep);
-                $result = calc_child_nodes($result, $all_nodes[$i], $deep);
+                $result = calc_parent_node($result, $all_nodes[$i]);
+                $result = calc_child_nodes($result, $all_nodes[$i]);
             }
-            $deep++;
         } while (count($result) < $total_count);
         return nodes_structure($result);
     }

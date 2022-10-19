@@ -54,6 +54,7 @@ if (!function_exists('nodes_refresh')) {
                     : null,
                 'given' => isset($node->given) ? $node->given : null,
                 'factor' => isset($node->factor) ? $node->factor : null,
+                'status' => !isset($node->factor) ? null : ($node->factor == 0 ? 'Bid' : ($node->factor == 1 ? 'Given' : ($node->factor == 2 ? 'Direct' : 'Indirect'))),
                 'children' => [],
             ]);
         }
@@ -89,14 +90,10 @@ if (!function_exists('components_to_components')) {
     {
         $itemsByReference = [];
 
-        // Build array of item references:
         foreach ($data as $key => &$item) {
             $itemsByReference[$item['id']] = &$item;
-            // Empty data class (so that json_encode adds "data: {}" )
-            // $itemsByReference[$item['id']]['data'] = new StdClass();
         }
 
-        // Set items as children of the relevant parent item.
         foreach ($data as $key => &$item) {
             if (
                 $item['parent_component_id'] &&
@@ -108,7 +105,6 @@ if (!function_exists('components_to_components')) {
             }
         }
 
-        // Remove items that were added to parents elsewhere:
         foreach ($data as $key => &$item) {
             if (
                 $item['parent_component_id'] &&
@@ -164,56 +160,6 @@ if (!function_exists('calc_given_nodes')) {
             $node->real_cost = $req->value;
             $node->factor = 1;
             $result[] = $node;
-        }
-        return $result;
-    }
-}
-
-if (!function_exists('calc_neigh_nodes')) {
-    function calc_neigh_nodes($given_nodes)
-    {
-        $result = $given_nodes;
-        foreach ($given_nodes as $node) {
-            $neigh_nodes = get_neighbors($node);
-            $parent_node = get_parent($node);
-            if (!isset($parent_node)) {
-                continue;
-            } else {
-                if (is_already_calc($result, $parent_node) !== null) {
-                    $p_cost = is_already_calc($result, $parent_node)->real_cost;
-                    $done_sum = 0;
-                    $weight_sum = 0;
-                    foreach ($neigh_nodes as $n_node) {
-                        if (is_already_calc($result, $n_node) != null) {
-                            $done_sum += is_already_calc($result, $n_node)
-                                ->real_cost;
-                        } else {
-                            $weight_sum += $n_node->cost;
-                        }
-                    }
-                    $un_sum = $p_cost - $done_sum;
-                    foreach ($neigh_nodes as $n_node) {
-                        if (is_already_calc($result, $n_node) != null) {
-                            continue;
-                        } else {
-                            $n_node->real_cost =
-                                ($un_sum * $n_node->cost) / $weight_sum;
-                            $n_node->factor = 2;
-                            $result[] = $n_node;
-                        }
-                    }
-                } else {
-                    foreach ($neigh_nodes as $n_node) {
-                        if (is_already_calc($result, $n_node) !== null) {
-                            continue;
-                        } else {
-                            $n_node->real_cost = $n_node->cost;
-                            $n_node->factor = 0;
-                            $result[] = $n_node;
-                        }
-                    }
-                }
-            }
         }
         return $result;
     }
@@ -299,7 +245,7 @@ if (!function_exists('get_total_count')) {
 }
 
 if (!function_exists('calc_parent_node')) {
-    function calc_parent_node($arr, $node, $deep)
+    function calc_parent_node($arr, $node)
     {
         $result_arr = $arr;
         $result = 0;
@@ -314,15 +260,17 @@ if (!function_exists('calc_parent_node')) {
                 return $result_arr;
             } else {
                 $n_nodes = get_neighbors($node);
+                $result_arr = calc_neigh_nodes($result_arr, $node);
                 foreach ($n_nodes as $n_node) {
-                    foreach ($arr as $d_node) {
+                    foreach ($result_arr as $d_node) {
                         if ($d_node->ref_id == $n_node->ref_id) {
                             $result += $d_node->real_cost;
                         }
                     }
                 }
+                $current_node = is_already_calc($result_arr, $node);
                 $parent_node->real_cost = $result;
-                $parent_node->factor = $deep;
+                $parent_node->factor = $current_node->factor + 1;
                 $result_arr[] = $parent_node;
                 return $result_arr;
             }
@@ -359,7 +307,7 @@ if (!function_exists('get_child_nodes')) {
 }
 
 if (!function_exists('calc_child_nodes')) {
-    function calc_child_nodes($arr, $node, $deep)
+    function calc_child_nodes($arr, $node)
     {
         $result_arr = $arr;
         if (is_already_calc($arr, $node) == null) {
@@ -377,22 +325,64 @@ if (!function_exists('calc_child_nodes')) {
                     $sum += $c_node->cost;
                 }
                 foreach ($child_nodes as $c_node) {
-                    // try {
-                    //     $c_node->real_cost =
-                    //         ($node->real_cost * $c_node->cost) / $sum;
-                    // } catch (Exception $e) {
-                    //     print_r([$deep, $node, $c_node, $result_arr]);
-                    //     exit();
-                    // }
                     $node = is_already_calc($arr, $node);
 
                     $c_node->real_cost =
                         ($node->real_cost * $c_node->cost) / $sum;
-                    $c_node->factor = $deep;
+                    $c_node->factor = $node->factor == 0 ? 0 : $node->factor + 1;
                     $result_arr[] = $c_node;
                 }
                 return $result_arr;
             }
         }
+    }
+}
+
+if (!function_exists('calc_neigh_nodes')) {
+    function calc_neigh_nodes($arr, $node)
+    {
+        $result = $arr;
+        $neigh_nodes = get_neighbors($node);
+        $parent_node = get_parent($node);
+        if (!isset($parent_node)) {
+            return $result;
+        } else {
+            if (is_already_calc($result, $parent_node) !== null) {
+                $p_cost = is_already_calc($result, $parent_node)->real_cost;
+                $done_sum = 0;
+                $weight_sum = 0;
+                foreach ($neigh_nodes as $n_node) {
+                    if (is_already_calc($result, $n_node) != null) {
+                        $done_sum += is_already_calc($result, $n_node)
+                            ->real_cost;
+                    } else {
+                        $weight_sum += $n_node->cost;
+                    }
+                }
+                $un_sum = $p_cost - $done_sum;
+                foreach ($neigh_nodes as $n_node) {
+                    if (is_already_calc($result, $n_node) != null) {
+                        continue;
+                    } else {
+                        $node = is_already_calc($arr, $node);
+                        $n_node->real_cost =
+                            ($un_sum * $n_node->cost) / $weight_sum;
+                        $n_node->factor = $node->factor + 1;
+                        $result[] = $n_node;
+                    }
+                }
+            } else {
+                foreach ($neigh_nodes as $n_node) {
+                    if (is_already_calc($result, $n_node) !== null) {
+                        continue;
+                    } else {
+                        $n_node->real_cost = $n_node->cost;
+                        $n_node->factor = 0;
+                        $result[] = $n_node;
+                    }
+                }
+            }
+        }
+        return $result;
     }
 }
