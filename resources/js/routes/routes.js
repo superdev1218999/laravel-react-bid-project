@@ -4,7 +4,6 @@ import Dashboard from "../pages/Dashboard";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
-import Archive from "../pages/Archive";
 import NoMatch from "../pages/NoMatch";
 
 const routes = [
