@@ -49,11 +49,12 @@ if (!function_exists('nodes_refresh')) {
                 'parent_component_id' => isset($config->parent_component_id)
                     ? $config->parent_component_id
                     : null,
-                'children' => [],
                 'real_cost' => isset($node->real_cost)
                     ? $node->real_cost
                     : null,
+                'given' => isset($node->given) ? $node->given : null,
                 'factor' => isset($node->factor) ? $node->factor : null,
+                'children' => [],
             ]);
         }
         return $result;
@@ -92,7 +93,7 @@ if (!function_exists('components_to_components')) {
         foreach ($data as $key => &$item) {
             $itemsByReference[$item['id']] = &$item;
             // Empty data class (so that json_encode adds "data: {}" )
-            $itemsByReference[$item['id']]['data'] = new StdClass();
+            // $itemsByReference[$item['id']]['data'] = new StdClass();
         }
 
         // Set items as children of the relevant parent item.
@@ -279,9 +280,6 @@ if (!function_exists('get_parent')) {
 if (!function_exists('is_already_calc')) {
     function is_already_calc($arr, $node)
     {
-        if (!property_exists($node, 'real_cost')) {
-            return null;
-        }
         foreach ($arr as $item) {
             if ($item->ref_id == $node->ref_id) {
                 return $item;
@@ -379,6 +377,15 @@ if (!function_exists('calc_child_nodes')) {
                     $sum += $c_node->cost;
                 }
                 foreach ($child_nodes as $c_node) {
+                    // try {
+                    //     $c_node->real_cost =
+                    //         ($node->real_cost * $c_node->cost) / $sum;
+                    // } catch (Exception $e) {
+                    //     print_r([$deep, $node, $c_node, $result_arr]);
+                    //     exit();
+                    // }
+                    $node = is_already_calc($arr, $node);
+
                     $c_node->real_cost =
                         ($node->real_cost * $c_node->cost) / $sum;
                     $c_node->factor = $deep;
