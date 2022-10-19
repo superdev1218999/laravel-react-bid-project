@@ -35,10 +35,13 @@ class BidController extends ApiController
         $result = $neigh_nodes;
         do {
             for ($i = 0; $i < $total_count; $i++) {
+                if (is_already_calc($result, $all_nodes[$i]) == null) {
+                    continue;
+                }
                 $result = calc_parent_node($result, $all_nodes[$i], $deep);
                 $result = calc_child_nodes($result, $all_nodes[$i], $deep);
-                $deep++;
             }
+            $deep++;
         } while (count($result) < $total_count);
         return nodes_structure($result);
     }
