@@ -3,12 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Arr;
 use App\Http\Controllers\APIController;
-use App\Bid;
-use App\BidComponent;
-use App\BidLineItem;
 
 class BidController extends ApiController
 {
@@ -19,21 +14,8 @@ class BidController extends ApiController
      */
     public function index(Request $request)
     {
-        $bids = Bid::get();
-        $components = BidComponent::get();
-        $line_items = BidLineItem::get();
-        $all_nodes = Arr::collapse([$bids, $components, $line_items]);
-
-        return nodes_organize($all_nodes);
-
-        return response()->json(
-            [
-                'status' => 201,
-                'message' => 'Resource created.',
-                'id' => 123,
-            ],
-            201
-        );
+        $all_nodes = get_all_nodes();
+        return nodes_structure($all_nodes);
     }
 
     /**
@@ -44,13 +26,20 @@ class BidController extends ApiController
      */
     public function store(Request $request)
     {
-        return response()->json(
-            [
-                'status' => 201,
-                'message' => 'Resource created.',
-                'id' => 1239,
-            ],
-            201
-        );
+        $request_data = json_decode($request->get('data'));
+        $given_nodes = calc_given_nodes($request_data);
+        $neigh_nodes = calc_neigh_nodes($given_nodes);
+        $total_count = get_total_count();
+        $all_nodes = get_all_nodes();
+        $deep = 2;
+        $result = $neigh_nodes;
+        do {
+            for ($i = 0; $i < $total_count; $i++) {
+                $result = calc_parent_node($result, $all_nodes[$i], $deep);
+                $result = calc_child_nodes($result, $all_nodes[$i], $deep);
+                $deep++;
+            }
+        } while (count($result) < $total_count);
+        return nodes_structure($result);
     }
 }
