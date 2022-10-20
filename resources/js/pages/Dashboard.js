@@ -97,7 +97,6 @@ const Dashboard = () => {
       };
       Http.post(api, metaData)
         .then((res) => {
-          console.log(res.data);
           setResultData(traverse(res.data));
         })
         .catch((err) => {

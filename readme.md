@@ -63,7 +63,13 @@ php artisan db:seed
 
 #### Seeded User
 
-After seeding the database, you can log in with these credentials:
+After seeding the database, run the server.
+
+```
+php artisan serve
+```
+
+You can log in with these credentials:
 
 Email: `user@test.dev`
 Password: `password`
